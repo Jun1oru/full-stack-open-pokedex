@@ -2,9 +2,10 @@ name: Deployment pipeline
 
 on:
   push:
-    branches: [main, master]
+    branches:
+      - main
   pull_request:
-    branches: [main, master]
+    branches: [main]
     types: [opened, synchronize]
 
 jobs:
@@ -35,4 +36,5 @@ jobs:
       - name: E2E-Test code
         run: npx playwright test
       - name: Trigger deployment
+        if: ${{ github.event_name == 'push' }}
         run: curl https://api.render.com/deploy/srv-${{ secrets.RENDER_SERVICE_ID }}?key=${{ secrets.RENDER_API_KEY }}
