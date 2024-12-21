@@ -38,6 +38,36 @@ jobs:
       - name: Trigger deployment
         if: ${{ github.event_name == 'push' && !contains(join(github.event.commits.*.message, ','), '#skip') }}
         run: curl https://api.render.com/deploy/srv-${{ secrets.RENDER_SERVICE_ID }}?key=${{ secrets.RENDER_API_KEY }}
+      - name: Notification Success
+        if: ${{ success() }}
+        uses: tsickert/discord-webhook@86dc739f3f165f16dadc5666051c367efa1692f4
+        with:
+          webhook-url: ${{ secrets.DISCORD_WEBHOOK }}
+          username: 'Pokedex-Notifier'
+          embed-title: 'Build finished successfully!'
+          embed-description: '[commit](https://github.com/${{ github.repository }}/commit/${{ github.sha }}) by ${{ github.actor }}'
+          embed-footer-text: 'Severity: Informational'
+          embed-color: 20ff11
+      - name: Notification Failure
+        if: ${{ failure() }}
+        uses: tsickert/discord-webhook@86dc739f3f165f16dadc5666051c367efa1692f4
+        with:
+          webhook-url: ${{ secrets.DISCORD_WEBHOOK }}
+          username: 'Pokedex-Notifier'
+          embed-title: 'Build failed!'
+          embed-description: '[commit](https://github.com/${{ github.repository }}/commit/${{ github.sha }}) by ${{ github.actor }} broke the build :('
+          embed-footer-text: 'Severity: Error'
+          embed-color: ff2011
+      - name: Notification Cancel
+        if: ${{ cancelled() }}
+        uses: tsickert/discord-webhook@86dc739f3f165f16dadc5666051c367efa1692f4
+        with:
+          webhook-url: ${{ secrets.DISCORD_WEBHOOK }}
+          username: 'Pokedex-Notifier'
+          embed-title: 'Build cancelled!'
+          embed-description: 'Test and deployment cancelled'
+          embed-footer-text: 'Severity: Warning'
+          embed-color: fac400
   tag_release:
     needs: [simple_deployment_pipeline]
     if: ${{ github.event_name == 'push' && !contains(join(github.event.commits.*.message, ','), '#skip') }}
