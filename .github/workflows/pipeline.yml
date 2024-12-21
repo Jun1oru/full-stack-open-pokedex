@@ -40,37 +40,34 @@ jobs:
         run: curl https://api.render.com/deploy/srv-${{ secrets.RENDER_SERVICE_ID }}?key=${{ secrets.RENDER_API_KEY }}
       - name: Notification Success
         if: ${{ success() }}
-        uses: rjstone/discord-webhook-notify@v1
+        uses: tsickert/discord-webhook@86dc739f3f165f16dadc5666051c367efa1692f4
         with:
-          severity: info
-          username: Pokedex-Notifier
-          color: '#20ff11'
-          description: to https://full-stack-open-pokedex-gzkj.onrender.com/ by ${{ github.actor }}
-          footer: 'Severity: Informational'
-          text: A new version of Pokedex deployed
-          webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
+          webhook-url: ${{ secrets.DISCORD_WEBHOOK }}
+          username: 'Pokedex-Notifier'
+          embed-title: 'Build finished successfully!'
+          embed-description: '[commit](https://github.com/${{ github.repository }}/commit/${{ github.sha }}) by ${{ github.actor }}'
+          embed-footer-text: 'Severity: Informational'
+          embed-color: 20ff11
       - name: Notification Failure
         if: ${{ failure() }}
-        uses: rjstone/discord-webhook-notify@v1
+        uses: tsickert/discord-webhook@86dc739f3f165f16dadc5666051c367efa1692f4
         with:
-          severity: error
-          username: Pokedex-Notifier
-          color: '#ff2011'
-          description: commit https://github.com/${{ github.repository }}/commit/${{ github.sha }} by ${{ github.actor }} broke the build :(
-          footer: 'Severity: Error'
-          text: Build failed
-          webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
+          webhook-url: ${{ secrets.DISCORD_WEBHOOK }}
+          username: 'Pokedex-Notifier'
+          embed-title: 'Build failed!'
+          embed-description: '[commit](https://github.com/${{ github.repository }}/commit/${{ github.sha }}) by ${{ github.actor }} broke the build :('
+          embed-footer-text: 'Severity: Error'
+          embed-color: ff2011
       - name: Notification Cancel
         if: ${{ cancelled() }}
-        uses: rjstone/discord-webhook-notify@v1
+        uses: tsickert/discord-webhook@86dc739f3f165f16dadc5666051c367efa1692f4
         with:
-          severity: warn
-          username: Pokedex-Notifier
-          color: '#fac400'
-          description: Test and deployment cancelled
-          footer: 'Severity: Warning'
-          text: Build cancelled!
-          webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
+          webhook-url: ${{ secrets.DISCORD_WEBHOOK }}
+          username: 'Pokedex-Notifier'
+          embed-title: 'Build cancelled!'
+          embed-description: 'Test and deployment cancelled'
+          embed-footer-text: 'Severity: Warning'
+          embed-color: fac400
   tag_release:
     needs: [simple_deployment_pipeline]
     if: ${{ github.event_name == 'push' && !contains(join(github.event.commits.*.message, ','), '#skip') }}
