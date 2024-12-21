@@ -38,6 +38,39 @@ jobs:
       - name: Trigger deployment
         if: ${{ github.event_name == 'push' && !contains(join(github.event.commits.*.message, ','), '#skip') }}
         run: curl https://api.render.com/deploy/srv-${{ secrets.RENDER_SERVICE_ID }}?key=${{ secrets.RENDER_API_KEY }}
+      - name: Notification Success
+        if: ${{ success() }}
+        uses: rjstone/discord-webhook-notify@v1
+        with:
+          severity: info
+          username: Pokedex-Notifier
+          color: '#20ff11'
+          description: to https://full-stack-open-pokedex-gzkj.onrender.com/ by ${{ github.actor }}
+          footer: 'Severity: Informational'
+          text: A new version of Pokedex deployed
+          webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
+      - name: Notification Failure
+        if: ${{ failure() }}
+        uses: rjstone/discord-webhook-notify@v1
+        with:
+          severity: error
+          username: Pokedex-Notifier
+          color: '#ff2011'
+          description: commit https://github.com/${{ github.repository }}/commit/${{ github.sha }} by ${{ github.actor }} broke the build :(
+          footer: 'Severity: Error'
+          text: Build failed
+          webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
+      - name: Notification Cancel
+        if: ${{ cancelled() }}
+        uses: rjstone/discord-webhook-notify@v1
+        with:
+          severity: warn
+          username: Pokedex-Notifier
+          color: '#fac400'
+          description: Test and deployment cancelled
+          footer: 'Severity: Warning'
+          text: Build cancelled!
+          webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
   tag_release:
     needs: [simple_deployment_pipeline]
     if: ${{ github.event_name == 'push' && !contains(join(github.event.commits.*.message, ','), '#skip') }}
