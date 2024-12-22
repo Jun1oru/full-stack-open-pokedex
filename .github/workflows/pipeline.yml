@@ -11,7 +11,7 @@ on:
 jobs:
   simple_deployment_pipeline:
     timeout-minutes: 60
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -47,7 +47,7 @@ jobs:
           embed-title: 'Build finished successfully!'
           embed-description: '[commit](https://github.com/${{ github.repository }}/commit/${{ github.sha }}) by ${{ github.actor }}'
           embed-footer-text: 'Severity: Informational'
-          embed-color: 20ff11
+          embed-color: 2162449
       - name: Notification Failure
         if: ${{ failure() }}
         uses: tsickert/discord-webhook@86dc739f3f165f16dadc5666051c367efa1692f4
@@ -57,7 +57,7 @@ jobs:
           embed-title: 'Build failed!'
           embed-description: '[commit](https://github.com/${{ github.repository }}/commit/${{ github.sha }}) by ${{ github.actor }} broke the build :('
           embed-footer-text: 'Severity: Error'
-          embed-color: ff2011
+          embed-color: 16719889
       - name: Notification Cancel
         if: ${{ cancelled() }}
         uses: tsickert/discord-webhook@86dc739f3f165f16dadc5666051c367efa1692f4
@@ -67,11 +67,11 @@ jobs:
           embed-title: 'Build cancelled!'
           embed-description: 'Test and deployment cancelled'
           embed-footer-text: 'Severity: Warning'
-          embed-color: fac400
+          embed-color: 16434176
   tag_release:
     needs: [simple_deployment_pipeline]
     if: ${{ github.event_name == 'push' && !contains(join(github.event.commits.*.message, ','), '#skip') }}
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v4
         with:
